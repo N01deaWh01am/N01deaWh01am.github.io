@@ -306,4 +306,4 @@ evil-winrm -i $IP -u administrator -H '3dc553ce4b9fd20bd016e098d2d2fd2e'
 
 --> Happy Hacking :3
 
-![Happy hacking kitty](HTB/Administrator%20(Done)/Images/Happy%20hacking.png)
+![Happy hacking kitty](Images/Happy%20hacking.png)
