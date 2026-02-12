@@ -1,0 +1,15 @@
+languageCode = "en"
+languageName = "English"
+weight = 1
+title = "N01deaWh01am"
+
+[params.author]
+  name = "N01deaWh01am"
+  #email = "nuno@n9o.xyz"
+  image = "my_profile.jpg"
+  headline = "Cybersecurity Engineer & CTF Player"
+  bio = "Welcome to my portfolio. I share my Hack The Box writeups here."
+  links = [
+    { linkedin = "https://www.linkedin.com/in/imanebehaj/" },
+    { github = "https://github.com/N01deaWh01am" },
+  ]

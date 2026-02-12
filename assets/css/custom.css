@@ -1,0 +1,8 @@
+.logo {
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    /* Since your image is 960x540 (rectangle), we force it to be a circle */
+    width: 50px !important; 
+    height: 50px !important;
+}
