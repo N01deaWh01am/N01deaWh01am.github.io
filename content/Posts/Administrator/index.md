@@ -1,9 +1,12 @@
 ﻿---
-title: "administrator - Hack The Box"
+title: "Administrator - Hack The Box"
 date: 2024-11-09
 description: "My walkthrough for administrator machine on HTB."
 tags: ["Windows", "Medium", "DCSync", "FTP", "PasswordSafe"]
+feature: "feature.png"
 ---
+
+![HTB Administrator](feature.png)
 
 #### Description
 ```
