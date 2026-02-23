@@ -291,7 +291,7 @@ impacket-GetUserSPNs -dc-ip $IP fluffy.htb/p.agila -request-user "winrm_svc"
 5. If the signature is valid → the KDC trusts the identity → issues a TGT.
 
 >[!Note]
->**Why it is dangerous ? **
+>**Why is it dangerous ?**
 >If an attacker can **modify** `msDS-KeyCredentialLink`, they can:
 >- Insert **their own public key** into the victim's account.
 >- Authenticate as that user using the corresponding **private key**, without knowing the password.
