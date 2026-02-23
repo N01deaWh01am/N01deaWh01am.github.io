@@ -293,10 +293,10 @@ impacket-GetUserSPNs -dc-ip $IP fluffy.htb/p.agila -request-user "winrm_svc"
 >[!Note]
 >**Why is it dangerous ?**
 >- If an attacker can **modify** `msDS-KeyCredentialLink`, they can:
->- Insert **their own public key** into the victim's account.
->- Authenticate as that user using the corresponding **private key**, without knowing the password.
->- The KDC will accept the authentication because the signature matches the public key the attacker injected.
->- This means the attacker can obtain a **valid TGT** as the victim. The attacker can fully **impersonate** the account. The attack is **silent** and usually not logged.
+>--> Insert **their own public key** into the victim's account.
+>--> Authenticate as that user using the corresponding **private key**, without knowing the password.
+>--> The KDC will accept the authentication because the signature matches the public key the attacker injected.
+>--> This means the attacker can obtain a **valid TGT** as the victim. The attacker can fully **impersonate** the account. The attack is **silent** and usually not logged.
 
 ```shell
 sudo timedatectl set-ntp 0
