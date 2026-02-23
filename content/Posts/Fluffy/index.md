@@ -271,8 +271,8 @@ python3 targetedKerberoast.py -v -d 'fluffy.htb' -u 'p.agila' -p 'prometheusx-30
 
 ![Uncrackable hash](Images/Uncrackable%20hash.png)
 
->[!Wait a minute .....]
->After some thinking, I realized that the previous step was a bit dumb on my part. The `winrm_svc` account is already a **service account**, meaning it already has an `SPN`. So even without `GenericWrite`, I can request a `TGS` and attempt to crack it. Meh… silly me!!!! 😅
+>[!Note]
+>Wait a minute ... !! After some thinking, I realized that the previous step was a bit dumb on my part. The `winrm_svc` account is already a **service account**, meaning it already has an `SPN`. So even without `GenericWrite`, I can request a `TGS` and attempt to crack it. Meh… silly me!!!! 😅
 
 ```shell
 impacket-GetUserSPNs -dc-ip $IP fluffy.htb/p.agila -request-user "winrm_svc"
@@ -290,7 +290,8 @@ impacket-GetUserSPNs -dc-ip $IP fluffy.htb/p.agila -request-user "winrm_svc"
 4. The KDC verifies the signature using the `public key` stored in `msDS-KeyCredentialLink`.
 5. If the signature is valid → the KDC trusts the identity → issues a TGT.
 
->[!Why it is dangerous ?]
+>[!Note]
+>**Why it is dangerous ? **
 >If an attacker can **modify** `msDS-KeyCredentialLink`, they can:
 >- Insert **their own public key** into the victim's account.
 >- Authenticate as that user using the corresponding **private key**, without knowing the password.
@@ -353,7 +354,8 @@ certipy find -dc-ip $IP -u winrm_svc -hashes 33bd09dcd697600edf6b3a7af4875767 -v
 
 ![](Images/Cert%20publishers.png)
 
-- The user `ca_svc` is part of `The Cert Publishers` group and it is also part of the `Service accounts` group, meaning we can retrieve its hash the same way we did with `winrm_svc` using `shadow credentials`. (The group `service accounts` has `GenericWrite` on its members which means any member can use `shadow credentials` on other members).
+- The user `ca_svc` is part of `The Cert Publishers` group and it is also part of the `Service accounts` group, meaning we can retrieve its hash the same way we did with `winrm_svc` using `shadow credentials`.
+- Also, it is worth noting that The group `service accounts` has `GenericWrite` on its members which means any member can use `shadow credentials` on other members.
 
 ```shell
 certipy shadow auto -u winrm_svc@fluffy.htb -hashes 33bd09dcd697600edf6b3a7af4875767 -account ca_svc
