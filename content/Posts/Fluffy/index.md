@@ -159,8 +159,6 @@ nxc smb $IP -u '' -p '' --shares
 nxc smb $IP -u '' -p '' --rid
 ```
 
---> `Anonymous login` is enabled but we lack the rights to enumerate `shares` or bruteforce `rid`.
-
 ![Anon login enabled but no rights](Images/Anon%20login%20enabled%20but%20no%20rights.png)
 
 - I used the provided credentials : 
