@@ -328,7 +328,7 @@ ssh-keygen -y -f id_ed25519
 
 - We will login now as `trivia` with the key : 
 
-![](Images/userflag%20inside%20william%20folder.png)
+![](Images/user%20flag%20inside%20william%20folder.png)
 
 - Flag : **{e0eb14fdca33724e256ded9556f4ec25}**
 ## Root.txt
