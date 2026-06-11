@@ -1,6 +1,6 @@
 ﻿---
 title: "CodePartTwo - Hack The Box"
-date: 2026-02-06
+date: 2025-08-16
 description: "My walkthrough for CodePartTwo machine on HTB."
 tags: ["Linux", "Easy"]
 ---
